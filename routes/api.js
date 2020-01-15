@@ -18,13 +18,27 @@ module.exports = function (app) {
   app.route('/api/convert')
     .get(function (req, res){
       var input = req.query.input;
+      
       var initNum = convertHandler.getNum(input);
       var initUnit = convertHandler.getUnit(input);
-      var returnNum = convertHandler.convert(initNum, initUnit);
-      var returnUnit = convertHandler.getReturnUnit(initUnit);
-      var toString = convertHandler.getString(initNum, initUnit, returnNum, returnUnit);
-      
-      //res.json
-    });
+      if(initNum==null && initUnit!==null){
+        res.json({data:{error:"invalid number"}, string:"Error - " + input})
+      } else if(initNum!==null && initUnit==null){
+        res.json({data:{error:"invalid unit"}, string:"Error - " + input})
+      } else if(initNum==null && initUnit==null){
+        res.json({data:{error:"invalid number and unit"}, string:"Error - " + input})
+      } else {
+        console.log((initNum))
+        var returnNum = convertHandler.convert(initNum, initUnit);
+        var returnUnit = convertHandler.getReturnUnit(initUnit);
+        var toString = convertHandler.getString(initNum, initUnit, returnNum, returnUnit);
+        res.json({data:{initNum:Number(initNum).toString(), 
+                        initUnit:initUnit,
+                        returnNum:Number(returnNum).toString(),
+                        returnUnit:returnUnit,
+                        string:toString},
+                  string:toString})
+      }
+      });
     
 };
